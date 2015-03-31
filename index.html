@@ -1,32 +1,31 @@
 <html>
 <button type = "button" id = "b" onclick = "start();">Start!</button>
-<p></p>
+<p id = "label"></p>
 <canvas id = "c" width = "500"; height = "400"></canvas>
+<p id = "results"></p>
 <script>
-var ballX, ballY;
+var x = 100, y = 100, vY = 0, vX = 0;
+var bounceFy = 3;
+var bounceFx = 1;
 var interval;
 var tickTime = 10;
 var canvas = document.getElementById("c");
 var ctx = canvas.getContext('2d');
+var floor = canvas.height - 21;
+var side = canvas.width;
+var size = 10;
+var frame = 0;
+var distance = canvas.width / 10;
+
 var start = function()
 {
-	ctx.clearRect(0,0, canvas.width, canvas.height);
+	document.getElementById("results").innerHTML = "RECOUNTING BALLOTS...";
 	console.log("Start!");
-	var black = true;
-	var distance = canvas.width / 10;
-	for(var i = 0; i < 10; ++i)
-	{
-		if(black)
-			ctx.strokeStyle = "black";
-		else
-			ctx.strokeStyle = "red";
-
-		ctx.stroke();
-		ctx.moveTo(i* distance, canvas.height);
-		ctx.lineTo((i*distance) + distance, canvas.height);
-		console.log("black = " + black + " at " + (i*distance) + " to " + ((i*distance) + distance) + ", coloring with " + ctx.strokeStyle);
-		black = !black;
-	}
+	x = 100; y = 100;
+	vX = Math.random() * 30 - 15;
+	vY = Math.random() * 30 - 15;
+	console.log("")
+	draw();
 	startTicking();
 }
 
@@ -35,10 +34,119 @@ var startTicking = function()
 	clearInterval(interval);
 	interval = setInterval(tick, tickTime);
 }
+var draw = function()
+{
+	ctx.clearRect(0,0, canvas.width, canvas.height);
+	var black = true;
+	for(var i = 0; i < 10; ++i)
+	{
+		if(black)
+			ctx.strokeStyle = "black";
+		else
+			ctx.strokeStyle = "red";
+		ctx.beginPath();
+		ctx.moveTo((i* distance), canvas.height - 20);
+		ctx.lineTo((i*distance) + distance, canvas.height - 20);
+		ctx.stroke();
+		ctx.beginPath();
+		ctx.moveTo((i* distance), canvas.height - 21);
+		ctx.lineTo((i*distance) + distance, canvas.height - 21);
+		ctx.stroke();
+		if(black)
+			ctx.fillText("   Bush", (i * distance), canvas.height - 10);
+		else			
+			ctx.fillText("   Gore", (i * distance), canvas.height - 10);
+
+		console.log("tick yo");
+		black = !black;
+	}
+	ctx.beginPath();
+	ctx.fillStyle = "red";
+	ctx.arc(x,y,size,0,2*Math.PI);
+	ctx.fill();
+}
 
 var tick = function()
-{
-
+{		
+	if((y + size) >= (floor - 1)	|| y - size <= 0)
+	{		
+		vY = -vY;
+		if(vY <= bounceFy && vY >= -bounceFy)
+		vY = 0;
+		else if(vY>0)
+		{
+		vY -= bounceFy;
+		}
+		else if(vY <0)
+		{
+		vY+=bounceFy;
+		}
+		if(vX <= bounceFx && vX >= -bounceFx)
+		vX = 0;	
+		else if(vX > bounceFx)
+		{
+			for(var i = 0; i < 10; i+= 2)
+			{
+				if(x > (i*distance) + 2 && x < (i*distance) + distance - 2)
+				{					
+				vX -= bounceFx;
+				break;
+				}
+			}
+		}
+		else if(vX < -bounceFx)
+		{
+			for(var i = 0; i < 10; i+= 2)
+			{
+				if(x > (i*distance) + 2 && x < (i*distance) + distance - 2)
+				{					
+				vX += bounceFx;
+				break;
+				}
+			}
+		}
+		
+	}	
+	else
+	{
+	//gravity
+		vY+=1;
+	}
+	document.getElementById("label").innerHTML = "The ball is traveling at yVelocity = " + vY + " and xVelocity = " + vX + " at (" + Math.floor(x) +", " + Math.floor(y) +")";
+	x+=vX;
+	y+=vY;
+	if((x + size) >= (side - 1)	|| x - size <= 0)
+	{		
+		vX = -vX;
+		if(vX <= bounceFx && vX >= -bounceFx)
+		vX = 0;		
+		else if(vX>0)
+		vX -= bounceFx;
+	//	else if(vX <0)
+	//	vX+=bounceFx;		
+	}
+		var adjusted = false;
+	if((y + size + vY) > (floor - 1))
+	{
+			y = (floor - 1) - size;
+			adjusted = true;
+	}
+	else if(y -size <= 0)
+	{
+			y = size;
+	}
+	if((x + size) > (side - 1))
+			x = (side - 1) - size;
+	else if(x -size <= 0)
+			x = size;
+	draw();	
+	++frame;
+	if(vX == 0 && vY == 0)
+	{
+		var str = "BUSH HAS WON";
+		var result = str.blink();
+		document.getElementById("results").innerHTML = result;
+	}
 }
 </script>
 </html>
