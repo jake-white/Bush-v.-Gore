@@ -96,6 +96,7 @@ var draw = function()
 	ctx.font = "50px Courier New";
 	ctx.fillStyle = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
 	ctx.fillText("BUSH HAS WON", 50, 100);
+	document.getElementById("reaction").style.visibility = "visible";
 	}
 	ctx.beginPath();
 	ctx.fillStyle = "blue";
@@ -178,7 +179,6 @@ var tick = function()
 		done = true;
 		var image = Math.floor(Math.random()*5);
 		var str = ["obama1.gif", "obama2.gif", "romney1.gif", "romney2.gif", "bush1.gif"];
-		document.getElementById("reaction").style.visibility = "visible";
 		document.getElementById("reaction").src = str[image];
 	}
 }
