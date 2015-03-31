@@ -1,0 +1,44 @@
+<html>
+<button type = "button" id = "b" onclick = "start();">Start!</button>
+<p></p>
+<canvas id = "c" width = "500"; height = "400"></canvas>
+<script>
+var ballX, ballY;
+var interval;
+var tickTime = 10;
+var canvas = document.getElementById("c");
+var ctx = canvas.getContext('2d');
+var start = function()
+{
+	ctx.clearRect(0,0, canvas.width, canvas.height);
+	console.log("Start!");
+	var black = true;
+	var distance = canvas.width / 10;
+	for(var i = 0; i < 10; ++i)
+	{
+		if(black)
+			ctx.strokeStyle = "black";
+		else
+			ctx.strokeStyle = "red";
+
+		ctx.stroke();
+		ctx.moveTo(i* distance, canvas.height);
+		ctx.lineTo((i*distance) + distance, canvas.height);
+		console.log("black = " + black + " at " + (i*distance) + " to " + ((i*distance) + distance) + ", coloring with " + ctx.strokeStyle);
+		black = !black;
+	}
+	startTicking();
+}
+
+var startTicking = function()
+{
+	clearInterval(interval);
+	interval = setInterval(tick, tickTime);
+}
+
+var tick = function()
+{
+
+}
+</script>
+</html>
