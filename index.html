@@ -183,8 +183,8 @@ var tick = function()
 	if(vX == 0 && vY == 0 && !done)
 	{
 		done = true;
-		var image = Math.floor(Math.random()*5);
-		var str = ["obama1.gif", "obama2.gif", "romney1.gif", "romney2.gif", "bush1.gif"];
+		var str = ["obama1.gif", "obama2.gif", "romney1.gif", "romney2.gif", "bush1.gif", "bush2.gif"];
+		var image = Math.floor(Math.random()*str.length);
 		document.getElementById("reaction").src = str[image];
 	}
 }
