@@ -1,8 +1,12 @@
 <html>
-<button type = "button" id = "b" onclick = "start();">Start!</button>
-<p id = "label"></p>
-<canvas id = "c" width = "500"; height = "400"></canvas>
-<p id = "results"></p>
+<style>
+img.visible {
+	visibility: hidden
+}
+</style>
+<button type = "button" id = "b" onclick = "start();">Recount Those Ballots, Florida!</button>
+<br>
+<canvas id = "c" width = "500"; height = "400"></canvas><img class = "visible" id = "reaction">
 <script>
 var x = 100, y = 100, vY = 0, vX = 0;
 var bounceFy = 3;
@@ -16,15 +20,24 @@ var side = canvas.width;
 var size = 10;
 var frame = 0;
 var distance = canvas.width / 10;
+var done = false;
 
 var start = function()
 {
-	document.getElementById("results").innerHTML = "RECOUNTING BALLOTS...";
-	console.log("Start!");
+		document.getElementById("reaction").style.visibility = "hidden";
+	frame = 0;
+	done = false
 	x = 100; y = 100;
-	vX = Math.random() * 30 - 15;
-	vY = Math.random() * 30 - 15;
-	console.log("")
+	vX= 0;
+	while(vX == 0 && (vX < 5 || vX > -5))
+	{
+	vX = Math.floor(Math.random() * 30 - 15);
+	}
+	vY= 0;
+	while(vY == 0)
+	{
+	vY = Math.floor(Math.random() * 30 - 10);
+	}
 	draw();
 	startTicking();
 }
@@ -37,13 +50,27 @@ var startTicking = function()
 var draw = function()
 {
 	ctx.clearRect(0,0, canvas.width, canvas.height);
+	ctx.strokeStyle= "black";
+	ctx.moveTo(0,0);
+	ctx.lineTo(0,floor);
+	ctx.moveTo(0,0);
+	ctx.lineTo(side, 0);
+	ctx.moveTo(side,0);
+	ctx.lineTo(side, floor);
+	ctx.stroke();
 	var black = true;
 	for(var i = 0; i < 10; ++i)
 	{
 		if(black)
+		{
 			ctx.strokeStyle = "black";
+			ctx.fillStyle = "red";
+		}
 		else
+		{
 			ctx.strokeStyle = "red";
+			ctx.fillStyle = "black";
+		}
 		ctx.beginPath();
 		ctx.moveTo((i* distance), canvas.height - 20);
 		ctx.lineTo((i*distance) + distance, canvas.height - 20);
@@ -52,13 +79,19 @@ var draw = function()
 		ctx.moveTo((i* distance), canvas.height - 21);
 		ctx.lineTo((i*distance) + distance, canvas.height - 21);
 		ctx.stroke();
+		ctx.font = "11px Georgia";
 		if(black)
 			ctx.fillText("   Bush", (i * distance), canvas.height - 10);
 		else			
 			ctx.fillText("   Gore", (i * distance), canvas.height - 10);
-
-		console.log("tick yo");
+		ctx.fill();
 		black = !black;
+	}
+	if(done)
+	{
+	ctx.font = "50px Courier New";
+	ctx.fillStyle = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+	ctx.fillText("BUSH HAS WON", 50, 100);
 	}
 	ctx.beginPath();
 	ctx.fillStyle = "blue";
@@ -69,7 +102,16 @@ var draw = function()
 var tick = function()
 {		
 	if((y + size) >= (floor - 1)	|| y - size <= 0)
-	{		
+	{	
+		var onBush = false;
+		for(var i = 0; i < 10; i+= 2)
+			{
+				if(x > (i*distance) + 5 && x < (i*distance) + distance - 5)
+				{
+				onBush = true;				
+				break;
+				}
+			}	
 		vY = -vY;
 		if(vY <= bounceFy && vY >= -bounceFy)
 		vY = 0;
@@ -81,29 +123,16 @@ var tick = function()
 		{
 		vY+=bounceFy;
 		}
-		if(vX <= bounceFx && vX >= -bounceFx)
+		if(vX <= bounceFx && vX >= -bounceFx && onBush)
 		vX = 0;	
-		else if(vX > bounceFx)
-		{
-			for(var i = 0; i < 10; i+= 2)
-			{
-				if(x > (i*distance) + 2 && x < (i*distance) + distance - 2)
-				{					
+		else if(vX > bounceFx && onBush)
+		{	
 				vX -= bounceFx;
-				break;
-				}
-			}
 		}
-		else if(vX < -bounceFx)
+		else if(vX < -bounceFx && onBush)
 		{
-			for(var i = 0; i < 10; i+= 2)
-			{
-				if(x > (i*distance) + 2 && x < (i*distance) + distance - 2)
-				{					
+			
 				vX += bounceFx;
-				break;
-				}
-			}
 		}
 		
 	}	
@@ -112,13 +141,12 @@ var tick = function()
 	//gravity
 		vY+=1;
 	}
-	document.getElementById("label").innerHTML = "The ball is traveling at yVelocity = " + vY + " and xVelocity = " + vX + " at (" + Math.floor(x) +", " + Math.floor(y) +")";
 	x+=vX;
 	y+=vY;
 	if((x + size) >= (side - 1)	|| x - size <= 0)
 	{		
 		vX = -vX;
-		if(vX <= bounceFx && vX >= -bounceFx)
+		if(vX <= bounceFx && vX >= -bounceFx && onBush)
 		vX = 0;		
 		else if(vX>0)
 		vX -= bounceFx;
@@ -141,11 +169,13 @@ var tick = function()
 			x = size;
 	draw();	
 	++frame;
-	if(vX == 0 && vY == 0)
+	if(vX == 0 && vY == 0 && !done)
 	{
-		var str = "BUSH HAS WON";
-		var result = str.blink();
-		document.getElementById("results").innerHTML = result;
+		done = true;
+		var image = Math.floor(Math.random()*5);
+		var str = ["obama1.gif", "obama2.gif", "romney1.gif", "romney2.gif", "bush1.gif"];
+		document.getElementById("reaction").style.visibility = "visible";
+		document.getElementById("reaction").src = str[image];
 	}
 }
 </script>
