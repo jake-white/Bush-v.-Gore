@@ -1,4 +1,5 @@
 <html>
+<title>Bush v. Gore</title>
 <style>
 img.visible {
 	visibility: hidden
@@ -56,6 +57,7 @@ var draw = function()
 {
 	ctx.clearRect(0,0, canvas.width, canvas.height);
 	ctx.strokeStyle= "black";
+	ctx.beginPath();
 	ctx.moveTo(0,0);
 	ctx.lineTo(0,floor);
 	ctx.moveTo(0,0);
@@ -103,6 +105,9 @@ var draw = function()
 	ctx.fillStyle = "blue";
 	ctx.arc(x,y,size,0,2*Math.PI);
 	ctx.fill();
+	ctx.strokeStyle = "black";
+	ctx.stroke();
+	ctx.closePath();
 }
 
 var tick = function()
